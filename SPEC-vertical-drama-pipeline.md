@@ -505,6 +505,17 @@ Stated so it does not creep.
 
 Five phases. Each one is independently useful, which matters because you should stop if a phase does not earn its place.
 
+> **Build status as of 2026-09-19: phases 1 and 2 are built** and live at
+> `skills/vertical-drama-pipeline/`. 23 gates, 188 self-test assertions, a breach case for every
+> gate, and a six-episode fixture that passes all of them. Phase 3 remains blocked on open
+> question 1. Phases 4 and 5 are unstarted.
+>
+> Two deviations from this spec, both deliberate:
+> - The three intake path files are consolidated into one `references/intake.md`. At their real
+>   size, one file is simpler and the whole router is read at once anyway.
+> - The gate named `crowd-plan` in section 7 shipped as `blocking-plan`, which is what the field
+>   it checks is called.
+
 **Phase 1: the spine, the outline gates, and Path C.**
 `outline.json` schema, the outline validator with its twelve gates, `checkup`, and the self-test with a breach case for each. Ships **Path C complete** and Path B as far as the episode grid.
 *Why first:* Path C is the cheapest thing to validate against reality. Run it on an outline you already wrote and liked. If it flags things you know are fine, the gates are wrong, and finding that out now costs nothing.
