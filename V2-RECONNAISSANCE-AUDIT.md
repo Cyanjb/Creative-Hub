@@ -1,13 +1,70 @@
 # Creative Hub V2: Reconnaissance Audit
 
+> # ⚠️ RETRACTED IN PART, 19 September 2026
+>
+> **This audit's central finding was wrong. The Creative Hub V1 application exists.**
+>
+> It was built on **3 August 2026** and lives at `C:\Users\cyanj\Creative Hub`. It runs with
+> `npm run dev`. It was verified in a browser with zero console errors. It was never pushed to
+> GitHub, which is why this audit could not see it.
+>
+> **What it actually implements** (Vite + React 18 + TypeScript strict, Zustand, Express proxy
+> on `localhost:8787`): infinite canvas with pan/zoom/marquee/rotate, Frames as the structured
+> shot unit, image cards, text blocks, colour-coded wires, a 4-across scene-grouped storyboard
+> view with two-way edit sync, a Character Bible with a `signature` canonical prompt lock,
+> a World Builder with visual keys, a Script Room on the intensity curve, `@Character` context
+> resolution, 7 prompt enhancers, a 90+ term cinematography keyword library, a character-sheet
+> builder with a photoreal/animated fork, asset carousel, Ctrl-K search, PDF export, saved
+> workflow templates, localStorage for structure and IndexedDB for image blobs, and Higgsfield
+> /Runway/OpenArt routes as deliberate thin passthroughs.
+>
+> That is essentially the whole of spec Section 4. **Every "does not exist" in this document is
+> false.**
+>
+> **How the error happened, because it will happen again otherwise:** the GitHub repo genuinely
+> contains no code, the filesystem sweep genuinely found none, and when asked directly whether
+> the app existed, the answer given was that it had not been made. Three independent signals all
+> pointed the same way and all three were artefacts of the code living only on a Windows machine
+> that no tool in this session could reach. The prior architecture-review PDF made the same error
+> for the same reason.
+>
+> **The fix is not better auditing. It is pushing the code.** Until `C:\Users\cyanj\Creative Hub`
+> is in this repository, any AI working from GitHub will reach this same wrong conclusion, and
+> there is no backup of the only copy.
+>
+> **What in this document still stands:**
+>
+> - §2, the inventory of the 44-skill library, and how those skills map onto V2 objects. Unaffected.
+> - §5, Correction 1: Higgsfield **does** expose a preflight quote via `get_cost`. Verified from the
+>   live tool schema. Still true and still important.
+> - §6, the conflicts between the spec and reality regarding cost estimation and provider abstraction.
+> - §7, the risks about the skills library being a synced snapshot, Craft holding production truth,
+>   and Higgsfield transaction history ageing out. All still live.
+> - §8, the nine-item milestone scope.
+> - §10, the stack recommendation, now reframed: V1 already chose Vite + React + TypeScript +
+>   Zustand + Express. That is the stack. The open question is no longer what to build on, it is
+>   whether V2's SQLite layer extends V1 in place or runs alongside it.
+>
+> **What is void:** §0, §1, §3 (answers 1 through 10), §4's premise that there is no code to
+> migrate, §7's claim of no migration or data-loss risk, §9 Phase 0 item 1, and §10's
+> "confirmed greenfield" framing.
+>
+> The live status record is Craft → Coding Projects → Creative Hub → **"5. V2 Status &
+> Cross-Chat Log"**, which supersedes this document.
+
+---
+
 **Date:** 19 September 2026
-**Scope:** Inspection and planning only. No code was modified. No code was found to modify.
+**Scope:** Inspection and planning only. No code was modified.
+**Status:** Partially retracted. See the notice above before reading any section.
 **Against:** `CREATIVE-HUB-V2-SPEC.md` (30 sections, architecture baseline)
 **Branch:** `claude/creative-hub-v2-audit-ao95je`
 
 ---
 
 ## 0. Headline finding, read this before anything else
+
+> **VOID.** This section is wrong. The V1 app exists. See the retraction notice at the top. Retained as a record of the error.
 
 **There is no Creative Hub application. Not in this repository, not in this container, not anywhere I was able to reach. Confirmed by Cy on 19 September 2026: the app has not been built yet.**
 
@@ -70,7 +127,7 @@ I grepped the entire 572-file skills library for the spec's named features:
 
 The account holds six repositories: `Creative-Hub`, `dramaeverafter`, `Cyanjb`, `aiswlibrary`, `Prompt-Builder-East-Asia`, `MidJourney-`. None is plausibly the Creative Hub application by name or by recency. This session is scoped to `Creative-Hub` only, so I did not read inside the others.
 
-**Resolved.** Cy confirmed on 19 September 2026 that the app has not been built. No further search is needed. This is a greenfield build.
+> **VOID.** The app was found later the same day, in Craft, documented at `C:\Users\cyanj\Creative Hub`. It exists, it runs, and it was never pushed to GitHub. This section's evidence about the *repository* remains accurate; the conclusion drawn from it does not.
 
 ---
 
@@ -135,6 +192,8 @@ Everything else is Markdown instruction.
 ---
 
 ## 3. Answers to your eleven questions
+
+> **VOID for questions 1 to 10.** Every "does not exist" below is false; those things are built. Question 11's answer happens to survive: the overlap at the knowledge layer is real, and the software-layer figure should read roughly 60 per cent done rather than zero. Re-run this section against the real code.
 
 Given the above, here they are straight.
 
