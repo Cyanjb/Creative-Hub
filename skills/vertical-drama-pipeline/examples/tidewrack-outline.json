@@ -1,0 +1,197 @@
+{
+  "source": "Tidewrack",
+  "profile": "vertical-microdrama",
+  "params": {
+    "episodes": 6,
+    "secondsPerEpisode": 75,
+    "register": "a debt",
+    "adaptMode": "original"
+  },
+  "arc": [
+    { "episode": 1, "intensity": 5, "position": "hook" },
+    { "episode": 2, "intensity": 4, "position": "setup" },
+    { "episode": 3, "intensity": 6, "position": "build" },
+    { "episode": 4, "intensity": 9, "position": "peak" },
+    { "episode": 5, "intensity": 3, "position": "turn" },
+    { "episode": 6, "intensity": 3, "position": "button" }
+  ],
+  "characters": [
+    {
+      "id": "C01",
+      "name": "Vessa",
+      "tier": "lead",
+      "role": "a salvager working off a debt she did not agree to",
+      "arc": "from paying whatever is asked, to naming what she will not pay",
+      "from": ["original"],
+      "otherAnchors": [
+        "a waterline mark across the skin that rises a little through the day",
+        "four knuckles on every finger instead of three",
+        "eyes with no whites, flat slate edge to edge"
+      ]
+    },
+    {
+      "id": "C02",
+      "name": "The Harbourmaster",
+      "tier": "lead",
+      "role": "collects the harbour's debts and decides what counts as payment",
+      "arc": "from certain of the ledger, to bound by it",
+      "from": ["original"],
+      "otherAnchors": [
+        "a torso plated in overlapping barnacle shell, greenish at the seams",
+        "a narrow voice-slit at the throat where a mouth should sit",
+        "arms that fold at two elbows rather than one"
+      ]
+    },
+    {
+      "id": "C03",
+      "name": "Oret",
+      "tier": "support",
+      "role": "another debtor, further along, and a warning about where this ends",
+      "arc": "from advising Vessa to pay, to asking her to stop",
+      "from": ["original"],
+      "otherAnchors": [
+        "hair in wet rope lengths that never dry indoors",
+        "a spine ridge that shows in a line through the coat",
+        "fingernails of dark blue horn, thick as shell"
+      ]
+    },
+    {
+      "id": "C04",
+      "name": "The Tallykeeper",
+      "tier": "functional",
+      "role": "keeps the cord and says what is owed",
+      "from": ["original"],
+      "otherAnchors": [
+        "a face that is a smooth plate with nothing set into it",
+        "seven digits on each limb, evenly spaced",
+        "a coat stitched from sail canvas and pale bone"
+      ]
+    }
+  ],
+  "environments": [
+    {
+      "id": "E01",
+      "name": "The Wrackline",
+      "primary": true,
+      "variantOf": null,
+      "reusePlan": null
+    },
+    {
+      "id": "E02",
+      "name": "The Tallyhouse",
+      "primary": true,
+      "variantOf": null,
+      "reusePlan": null
+    },
+    {
+      "id": "E03",
+      "name": "The Wrackline, drained",
+      "primary": false,
+      "variantOf": "E01",
+      "reusePlan": "reuse the E01 plate, drop the tide to the sill line, swap the green light for flat grey, remove the moored hulls"
+    }
+  ],
+  "props": [
+    {
+      "id": "P01",
+      "name": "The tally-cord",
+      "function": "the physical record of what Vessa owes, knotted once per debt and never untied",
+      "turnIds": ["T01", "T03"]
+    },
+    {
+      "id": "P02",
+      "name": "Vessa's salvage hook",
+      "function": "the one thing she owns outright, and what the Harbourmaster keeps naming as the price",
+      "turnIds": ["T02"]
+    }
+  ],
+  "turns": [
+    {
+      "id": "T01",
+      "type": "the debt is named",
+      "weight": "minor",
+      "episode": 2,
+      "setup": "Vessa has been working the wrackline without being told what she is working off",
+      "payoff": "the Tallykeeper reads the cord aloud and the debt turns out to be inherited, not hers"
+    },
+    {
+      "id": "T02",
+      "type": "the price is revealed",
+      "weight": "major",
+      "episode": 4,
+      "setup": "the Harbourmaster has refused three payments without saying why",
+      "payoff": "he names the hook, which means naming the only thing that makes her a salvager rather than a debtor"
+    },
+    {
+      "id": "T03",
+      "type": "the cord is cut",
+      "weight": "major",
+      "episode": 6,
+      "setup": "Oret has shown her that the cord binds the keeper as tightly as the debtor",
+      "payoff": "Vessa cuts the cord and the Harbourmaster, no longer holding a ledger, has no standing in the harbour"
+    }
+  ],
+  "episodes": [
+    {
+      "ep": 1,
+      "synopsis": "Vessa works the wrackline at the turn of the tide, hauling salvage up the sill before the water comes back over it. The Harbourmaster watches from the stair and does not help. When she brings up a crate worth more than a week of hauling, he marks it into the ledger as nothing and walks away. She keeps working.",
+      "hook": "A salvager running the drained channel ahead of the returning tide, hauling something heavier than she is.",
+      "cliff": "The ledger closes on a crate that should have cleared her week, marked as worth nothing at all.",
+      "environmentIds": ["E01"],
+      "characterIds": ["C01", "C02"],
+      "propIds": ["P02"],
+      "warnings": ["water"]
+    },
+    {
+      "ep": 2,
+      "synopsis": "Called to the tallyhouse, Vessa asks what the total is. The Tallykeeper takes down the cord and counts the knots without being asked twice. The debt is older than Vessa. It came down to her from a woman she never met, and every year she has worked it has been interest, not principal.",
+      "hook": "The cord comes down off its peg, longer than she expected, and the counting starts.",
+      "cliff": "The first knot is older than she is, which means none of the work so far has touched the debt itself.",
+      "environmentIds": ["E02"],
+      "characterIds": ["C01", "C04"],
+      "propIds": ["P01"],
+      "warnings": []
+    },
+    {
+      "ep": 3,
+      "synopsis": "Oret finds Vessa on the drained wrackline and tells her how this goes. He has been paying for longer and the total has not moved. He advises her to keep paying anyway, because the ones who stop are not seen again. She offers him the crate. He will not take it.",
+      "hook": "Someone further along the same debt, walking out across the drained channel to reach her.",
+      "cliff": "He will not say what happens to the ones who stop paying, only that he has stopped asking.",
+      "environmentIds": ["E03"],
+      "characterIds": ["C01", "C03"],
+      "propIds": [],
+      "warnings": []
+    },
+    {
+      "ep": 4,
+      "synopsis": "Vessa brings the Harbourmaster three payments in one day and he refuses all three without looking at them. When she asks what he will take, he names the salvage hook. Without it she cannot work the wrackline, which means the debt can never be paid, which he already knows.",
+      "hook": "Three payments set down in a row on the sill, and a ledger that stays shut over all of them.",
+      "cliff": "He names the one thing that makes her a salvager, and the arithmetic of the debt closes behind it.",
+      "environmentIds": ["E01"],
+      "characterIds": ["C01", "C02"],
+      "propIds": ["P02"],
+      "warnings": ["water"]
+    },
+    {
+      "ep": 5,
+      "synopsis": "Oret comes to the tallyhouse and shows Vessa the other end of the cord, which is tied to the keeper's own peg. The cord binds both ways. The Harbourmaster holds the harbour only while there is a debt to hold, and he cannot cut it himself. Oret asks her to stop paying. Then he asks her to do more than stop.",
+      "hook": "The cord followed back along its length to a second peg nobody was meant to see.",
+      "cliff": "The man who spent three episodes telling her to keep paying asks her to cut the cord instead.",
+      "environmentIds": ["E02"],
+      "characterIds": ["C01", "C03", "C04"],
+      "blockingPlan": "Oret and the Tallykeeper never share a frame. Oret works in the foreground at the peg while the Tallykeeper is held in a separate single at the ledger table; Vessa carries the eyeline between them.",
+      "propIds": ["P01"],
+      "warnings": []
+    },
+    {
+      "ep": 6,
+      "synopsis": "Vessa walks into the tallyhouse with the salvage hook and does not offer it. She cuts the cord at the keeper's peg instead of her own. The knots stay, so the debt stays, but nothing holds the other end of it any more. The Harbourmaster arrives to collect and finds he has no standing to collect anything.",
+      "hook": "A salvager walking in carrying the one thing she was told to surrender, and not surrendering it.",
+      "cliff": "The debt is still owed and there is nobody left with the standing to collect it.",
+      "environmentIds": ["E02"],
+      "characterIds": ["C01", "C02"],
+      "propIds": ["P01", "P02"],
+      "warnings": []
+    }
+  ]
+}
