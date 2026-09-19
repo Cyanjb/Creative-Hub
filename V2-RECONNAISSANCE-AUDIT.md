@@ -9,7 +9,7 @@
 
 ## 0. Headline finding, read this before anything else
 
-**There is no Creative Hub application. Not in this repository, not in this container, not anywhere I was able to reach.**
+**There is no Creative Hub application. Not in this repository, not in this container, not anywhere I was able to reach. Confirmed by Cy on 19 September 2026: the app has not been built yet.**
 
 The V2 spec's Section 4 lists sixteen "existing capabilities to preserve where practical": infinite visual canvas, pan/zoom cards, Frames, image cards, text blocks, storyboard grid, scene grouping, Character Bible, World Builder, Script Room, `@Character` resolution, character signature lock, visual keys, character-sheet builder, asset carousel, prompt tools, cinematography keyword library, saved workflow templates, PDF export, local proxy/API infrastructure.
 
@@ -68,7 +68,9 @@ I grepped the entire 572-file skills library for the spec's named features:
 
 ### Other repositories
 
-The account holds six repositories: `Creative-Hub`, `dramaeverafter`, `Cyanjb`, `aiswlibrary`, `Prompt-Builder-East-Asia`, `MidJourney-`. None is plausibly the Creative Hub application by name or by recency. This session is scoped to `Creative-Hub` only, so I did not read inside the others. **If the application exists in one of them, or locally on your machine, tell me and this audit gets rewritten against real code.**
+The account holds six repositories: `Creative-Hub`, `dramaeverafter`, `Cyanjb`, `aiswlibrary`, `Prompt-Builder-East-Asia`, `MidJourney-`. None is plausibly the Creative Hub application by name or by recency. This session is scoped to `Creative-Hub` only, so I did not read inside the others.
+
+**Resolved.** Cy confirmed on 19 September 2026 that the app has not been built. No further search is needed. This is a greenfield build.
 
 ---
 
@@ -317,11 +319,11 @@ Do not implement any of this yet. This is the proposed order for review.
 
 **Phase 0: resolve the unknowns.** Half a day, and it changes the design.
 
-1. Confirm where the app is, if it exists. This audit assumes greenfield.
+1. ~~Confirm where the app is, if it exists.~~ **Done. Greenfield confirmed, 19 September 2026.**
 2. Confirm where the skills are authored, so edits are not lost to sync.
 3. Export all Craft production documents and the credit ledger to disk.
 4. Pull full Higgsfield transaction history to a local file.
-5. Decide the stack. The spec never names one. SQLite plus a local server plus a web UI is implied but not stated.
+5. Decide the stack. The spec never names one. Recommendation in §10: local-first SQLite, small Node or Python server, browser UI, media and Markdown on disk. **This is the one item blocking Phase 1.**
 6. Read the Higgsfield **REST** API docs, not just the MCP surface, and confirm: `get_cost` availability, job polling shape, concurrency cap, whether failed jobs charge.
 7. One cheap test: does Seedance 2.5 honour in-prompt cut timing?
 
@@ -343,13 +345,29 @@ The prior review's ordering argument holds and is worth restating: the first ver
 
 ---
 
-## 10. The one question I need answered
+## 10. Confirmed greenfield, and what that changes
 
-**Does the Creative Hub application exist somewhere I have not looked?**
+The open question in the first draft of this audit was whether the application existed somewhere I had not looked. **Cy confirmed on 19 September 2026 that it has not been built.** The audit stands as written.
 
-If yes, point me at it and I will redo this audit properly against real code. Sections 1 through 10 above would be rewritten entirely.
+Three consequences follow, and they should be applied to the spec before anyone builds from it.
 
-If no, then the spec's Section 4 should be amended before anyone builds from it, because it currently instructs an implementer to preserve sixteen things that do not exist, and design rule 12 tells them not to rewrite working code that is not there. Those two together are how a greenfield build acquires imaginary constraints.
+**1. Spec Section 4 must be amended.** It currently instructs an implementer to preserve sixteen capabilities that do not exist, and design rule 12 tells them not to rewrite working code that is not there. Together those are how a greenfield build acquires imaginary constraints. Replace Section 4 with what this audit's §2 records: the assets to preserve are the 44-skill knowledge library and the Craft production documents, and they are preserved by being *read from and handed off to*, not by being ported into the app.
+
+**2. The sequencing argument gets stronger, not weaker.** With nothing to migrate, there is no reason to build breadth before depth. The nine-item milestone in §8 is now the whole of V1, and every deferred item in §9 Phase 6 is genuinely deferrable rather than politically deferred.
+
+**3. The stack is now the only blocking decision.** The spec never names one. Nothing in §9 Phase 1 can start until it is chosen. The recommendation, stated plainly so it can be argued with:
+
+> **Local-first: SQLite via a small Node or Python server, plus a browser UI. Media on disk beside the database. Prose as Markdown files on disk.**
+
+The reasoning, in the order it matters:
+
+- **Local-first is a cost decision, not a taste one.** The entire motivation for V2 is controlling Higgsfield spend. A hosted app adds a bill before it saves a credit.
+- **SQLite satisfies spec §25 directly** and is one portable file, readable with standard tools, no server process to run, no migration story for a single user.
+- **The browser is required by spec §5 and §21.** The Board and the compare-takes view need thumbnails, playback and side-by-side video. That is a browser, not a terminal.
+- **Node has the smaller gap to close** if the Higgsfield REST API is the target, because the MCP surface is already JSON over HTTP and the existing `screenwriter` build scripts are already Node. Python is defensible if you prefer it; `qc.py` and `cutsheet.py` are Python and V2 shells out to them either way.
+- **Do not reach for a framework yet.** One server file, one schema file, one page. The thing that makes V1 valuable is the receipt and the output fetcher, not the component library.
+
+This is a recommendation, not a decision. Say the word if you would rather it were Python, or hosted, or built on something you already know.
 
 ---
 
