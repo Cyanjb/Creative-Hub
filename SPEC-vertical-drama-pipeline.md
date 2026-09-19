@@ -42,6 +42,37 @@ Boundaries to write into the description, because these are the four skills it s
 
 Expect to tune these in the first week of real use. Skill boundaries never survive first contact exactly as written.
 
+### 1.1 Why this is a separate skill and not an extension
+
+The existing library serves far more than micro-drama, and the obvious objection is that a format-specific skill narrows a general toolkit. The answer is narrower than "micro-dramas are different", and it is the decisive one:
+
+> **Gates need locked numbers.** Everything of value here depends on hard thresholds: cuts of 1.5 to 4.0 seconds, two people in frame, a hook inside three beats, ten words per line, runtime within ±15%. Those numbers are only defensible because the format is fixed. A 9:16 micro-drama beat, a 16:9 commercial beat and a walkthrough beat have genuinely different correct answers. A skill that must serve all three turns every gate into "it depends", and a gate that says it depends is a comment.
+
+This is precisely why it cannot live inside `production-bible-builder`. That skill supports six formats and branches on the choice, correctly. That structure makes hard failure impossible, which is the problem this skill exists to solve.
+
+Two supporting reasons, weaker on their own but real:
+
+- **Episode state.** No existing skill carries anything across episodes: turn spacing over a full run, a cast held consistent for weeks, props that recur. Adding that to `production-bible-builder` would make it worse at its actual job, which is planning one video well.
+- **Trigger containment.** Micro-drama rules living inside `video-prompt-director` would leak into client commercial work.
+
+**What does not belong here.** Nine of the twenty-one steals in the gap report touch existing skills, and five belong there exclusively (S2, S15, S18, S19, S20). Those are craft rules rather than format rules and they improve everything, so they should land regardless of whether this skill is ever built.
+
+### 1.2 Format profile: the machinery is general, only the numbers are not
+
+The spine, the seeds, the duration math and the beat-coverage check do not care about aspect ratio. Only the thresholds do. So:
+
+> **Every threshold lives in one format profile block at the top of the validator. Nothing below it is hardcoded.**
+
+The default profile is `vertical-microdrama`. A second format later (a 30-second commercial series, a YouTube run) is a new profile, not a new skill and not a rewrite. This is how the general benefit is kept without maintaining a shared code library across a 45-skill collection, which should not be attempted.
+
+The profile holds everything in the table in section 6, plus aspect ratio, safe-area percentage and the on-screen cap. A profile is a small block of named values with a comment on each explaining what it protects. When a number is changed, the self-test should still pass, and if it does not, the gate depended on a constant it should not have.
+
+### 1.3 The test for whether the boundary is right
+
+**Does the request name episodes?** Episodes means this skill. One video, however elaborate, means the existing ones.
+
+If real use keeps landing here for single videos, the description is wrong and needs tightening. That is a description fix, not an architecture fix, and it should not be treated as a reason to merge this back into another skill.
+
 ---
 
 ## 2. Design constraints
@@ -279,7 +310,7 @@ Handoff: a locked `shots.json` goes to `storyboard-to-video-workflow` for the sh
 
 ## 6. Runtime math
 
-The fix for hole 4. All parameters, all overridable, defaults chosen for English vertical drama.
+The fix for hole 4. Every value below lives in the `vertical-microdrama` format profile (section 1.2), not in the gate code. Defaults chosen for English vertical drama.
 
 | Parameter | Default | Where it comes from |
 |---|---|---|
@@ -521,6 +552,8 @@ The `risk-flags` gate needs the actual keyword list. Yours is scattered across `
 
 **8. Do you want this to remain one skill?**
 Shuohao split five ways. This spec keeps one skill with five stages, because your library already has a routing skill (`production-bible-builder`) and adding five more triggers to a 44-skill library makes routing worse, not better. If the SKILL.md grows past roughly 400 lines, revisit. The reference files keep most of the weight off the main file by design.
+
+Settled separately in section 1.1: this is a **new** skill rather than an extension of an existing one, because gates need locked numbers and every general-purpose skill in the library must branch on format instead. Section 1.2 keeps the machinery reusable through a format profile, so a second format later costs a config block rather than a fork.
 
 ---
 
