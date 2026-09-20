@@ -1,0 +1,11 @@
+CREATE TABLE meta (singleton INTEGER PRIMARY KEY CHECK(singleton=1), revision INTEGER NOT NULL);
+INSERT INTO meta VALUES (1,0);
+CREATE TABLE productions (id TEXT PRIMARY KEY, json TEXT NOT NULL);
+CREATE TABLE shots (id TEXT PRIMARY KEY, production_id TEXT NOT NULL REFERENCES productions(id), json TEXT NOT NULL, UNIQUE(id,production_id));
+CREATE TABLE shot_order (production_id TEXT NOT NULL REFERENCES productions(id), position INTEGER NOT NULL, shot_id TEXT NOT NULL UNIQUE, PRIMARY KEY(production_id,position), FOREIGN KEY(shot_id,production_id) REFERENCES shots(id,production_id));
+CREATE TABLE boards (id TEXT PRIMARY KEY, production_id TEXT NOT NULL REFERENCES productions(id), json TEXT NOT NULL, UNIQUE(id,production_id));
+CREATE TABLE nodes (board_id TEXT NOT NULL, id TEXT NOT NULL, production_id TEXT NOT NULL, shot_id TEXT, position INTEGER NOT NULL, json TEXT NOT NULL, PRIMARY KEY(board_id,id), FOREIGN KEY(board_id,production_id) REFERENCES boards(id,production_id), FOREIGN KEY(shot_id,production_id) REFERENCES shots(id,production_id));
+CREATE TABLE wires (board_id TEXT NOT NULL, id TEXT NOT NULL, from_id TEXT NOT NULL, to_id TEXT NOT NULL, position INTEGER NOT NULL, json TEXT NOT NULL, PRIMARY KEY(board_id,id), FOREIGN KEY(board_id,from_id) REFERENCES nodes(board_id,id), FOREIGN KEY(board_id,to_id) REFERENCES nodes(board_id,id));
+CREATE TABLE collections (name TEXT PRIMARY KEY,json TEXT NOT NULL);
+CREATE TABLE media (id TEXT PRIMARY KEY,production_id TEXT NOT NULL,relative_path TEXT NOT NULL,stage_path TEXT NOT NULL,sha256 TEXT NOT NULL,size INTEGER NOT NULL,mime TEXT NOT NULL,state TEXT NOT NULL CHECK(state IN ('staged','finalizing','ready','error')),error TEXT);
+PRAGMA user_version=1;

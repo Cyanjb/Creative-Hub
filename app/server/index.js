@@ -11,6 +11,8 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import { Repository } from './storage/repository.ts';
+import { v2Routes } from './v2Routes.ts';
 
 dotenv.config();
 
@@ -18,7 +20,7 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: '25mb' }));
 
-const PORT = process.env.PORT || 8787;
+const PORT = process.env.PORT || 8788;
 
 const KEYS = {
   anthropic: () => process.env.ANTHROPIC_API_KEY,
@@ -266,7 +268,7 @@ app.all('/api/openart/:path(*)', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, '127.0.0.1', () => {
   const configured = Object.entries(KEYS)
     .filter(([, g]) => g() && g().trim())
     .map(([n]) => n);
@@ -277,3 +279,5 @@ app.listen(PORT, () => {
       : `  No keys in .env yet — copy .env.example to .env and fill in what you have.\n`,
   );
 });
+
+for (const signal of ['SIGINT','SIGTERM']) process.on(signal,()=>server.close(()=>{repository.close();process.exit(0);}));
