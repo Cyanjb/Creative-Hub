@@ -47,6 +47,9 @@ function fail(res, status, message, detail) {
 
 // ── which providers are actually configured ──────────────────────────────
 
+const repository = new Repository();
+app.use('/api/v2', v2Routes(repository));
+
 app.get('/api/status', (_req, res) => {
   const out = {};
   for (const [name, get] of Object.entries(KEYS)) {
@@ -268,7 +271,7 @@ app.all('/api/openart/:path(*)', async (req, res) => {
   }
 });
 
-const server = app.listen(PORT, '127.0.0.1', () => {
+export const server = app.listen(PORT, '127.0.0.1', () => {
   const configured = Object.entries(KEYS)
     .filter(([, g]) => g() && g().trim())
     .map(([n]) => n);
@@ -276,7 +279,7 @@ const server = app.listen(PORT, '127.0.0.1', () => {
   console.log(
     configured.length
       ? `  Keys loaded: ${configured.join(', ')}\n`
-      : `  No keys in .env yet — copy .env.example to .env and fill in what you have.\n`,
+      : `  V2 local persistence is ready; provider credentials are not required.\n`,
   );
 });
 

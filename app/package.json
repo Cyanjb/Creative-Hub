@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "AI Workflow & Storyboard App \u00e2\u20ac\u201d infinite whiteboard, node wiring, storyboard grid, character bible, world builder.",
+  "description": "AI Workflow & Storyboard App â€” infinite whiteboard, node wiring, storyboard grid, character bible, world builder.",
   "scripts": {
     "dev": "concurrently -n web,api -c cyan,magenta \"vite\" \"tsx server/index.js\"",
     "dev:web": "vite",
@@ -12,7 +12,10 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "test": "tsx --test tests/*.test.ts",
-    "test:browser": "playwright test"
+    "test:browser": "playwright test",
+    "seed:synthetic": "tsx server/storageCli.ts seed",
+    "backup": "tsx server/storageCli.ts backup",
+    "restore": "tsx server/storageCli.ts restore"
   },
   "dependencies": {
     "better-sqlite3": "12.8.0",
@@ -36,7 +39,11 @@
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.4",
     "concurrently": "^9.1.0",
+    "prettier": "3.5.3",
     "typescript": "^5.7.2",
     "vite": "^5.4.11"
+  },
+  "engines": {
+    "node": ">=22.14.0 <23"
   }
 }

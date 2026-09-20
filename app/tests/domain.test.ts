@@ -1,10 +1,93 @@
-import {test} from 'node:test';import assert from 'node:assert/strict';
-import {fixture} from './fixtures/foundation';
-import {editFrame,frameView,duplicatePlacement,duplicateShot,removeNodes,removeBoard,reorderShots} from '../shared/v2Domain';
-import {stateSchema} from '../shared/v2Schema';
-test('two named Boards share canonical content; labels preserve identity and relationships',()=>{let s=fixture();assert.deepEqual(s.boards.map(b=>b.name),['Board A','Board B']);s=editFrame(s,'board-a','placement-a',{title:'From A',shot:'S03-SH04'});assert.equal(frameView(s,s.boards[1]).nodes[0].kind,'frame');assert.equal((frameView(s,s.boards[1]).nodes[0] as any).title,'From A');s=editFrame(s,'board-b','placement-b',{title:'From B'});assert.equal((frameView(s,s.boards[0]).nodes[0] as any).title,'From B');assert.equal(s.shots[0].id,'shot-one');assert.equal((s.boards[1].nodes[0] as any).shotId,'shot-one');assert.deepEqual(s.projects[0].shotOrder,['shot-one','shot-two']);assert.ok(!('title' in s.boards[0].nodes[0]));});
-test('placement geometry is independent and never changes editorial order',()=>{let s=fixture();const other=structuredClone(s.boards[1]);s=editFrame(s,'board-a','placement-a',{x:999,w:600,h:700});assert.deepEqual(s.boards[1],other);assert.deepEqual(s.projects[0].shotOrder,['shot-one','shot-two']);s=reorderShots(s,'production-demo',['shot-two','shot-one']);assert.equal(s.boards[0].nodes[0].x,999);assert.deepEqual(s.projects[0].shotOrder,['shot-two','shot-one']);});
-test('placement and Board deletion cannot delete canonical Shot or other placement',()=>{for(const s of [removeNodes(fixture(),'board-a',['placement-a']),removeBoard(fixture(),'board-a')]){assert.equal(s.shots.length,2);assert.equal((s.boards.find(b=>b.id==='board-b')!.nodes[0] as any).shotId,'shot-one');}});
-test('duplicate placement shares Shot; duplicate Shot gets new identity',()=>{let s=duplicatePlacement(fixture(),'board-a','placement-a','copy-placement');assert.equal(s.shots.length,2);assert.equal((s.boards[0].nodes.at(-1) as any).shotId,'shot-one');s=duplicateShot(s,'shot-one','new-shot');assert.equal(s.shots.length,3);assert.equal(s.shots[2].id,'new-shot');});
-test('planning, free cards and wires remain ordinary Board objects',()=>{const s=editFrame(fixture(),'board-a','planning',{notes:'Still planning'});assert.equal(s.shots.length,2);assert.equal(s.boards[0].nodes[1].kind,'frame');assert.equal((s.boards[0].nodes[1] as any).notes,'Still planning');assert.deepEqual(s.boards[0].nodes.slice(2).map(n=>n.kind),['text','image']);assert.equal(s.boards[0].wires[0].toId,'planning');});
-test('runtime validation rejects versions, dangling placements/order/wires and extra fields',()=>{for(const change of [(s:any)=>s.schemaVersion=99,(s:any)=>s.boards[0].nodes[0].shotId='missing',(s:any)=>s.projects[0].shotOrder=[],(s:any)=>s.boards[0].wires[0].toId='missing',(s:any)=>s.shots[0].surprise=true]){const s=fixture();change(s);assert.equal(stateSchema.safeParse(s).success,false);}});
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { fixture } from "./fixtures/foundation";
+import {
+  editFrame,
+  frameView,
+  duplicatePlacement,
+  duplicateShot,
+  removeNodes,
+  removeBoard,
+  reorderShots,
+} from "../shared/v2Domain";
+import { stateSchema } from "../shared/v2Schema";
+test("two named Boards share canonical content; labels preserve identity and relationships", () => {
+  let s = fixture();
+  assert.deepEqual(
+    s.boards.map((b) => b.name),
+    ["Board A", "Board B"],
+  );
+  s = editFrame(s, "board-a", "placement-a", {
+    title: "From A",
+    shot: "S03-SH04",
+  });
+  assert.equal(frameView(s, s.boards[1]).nodes[0].kind, "frame");
+  assert.equal((frameView(s, s.boards[1]).nodes[0] as any).title, "From A");
+  s = editFrame(s, "board-b", "placement-b", { title: "From B" });
+  assert.equal((frameView(s, s.boards[0]).nodes[0] as any).title, "From B");
+  assert.equal(s.shots[0].id, "shot-one");
+  assert.equal((s.boards[1].nodes[0] as any).shotId, "shot-one");
+  assert.deepEqual(s.projects[0].shotOrder, ["shot-one", "shot-two"]);
+  assert.ok(!("title" in s.boards[0].nodes[0]));
+});
+test("placement geometry is independent and never changes editorial order", () => {
+  let s = fixture();
+  const other = structuredClone(s.boards[1]);
+  s = editFrame(s, "board-a", "placement-a", { x: 999, w: 600, h: 700 });
+  assert.deepEqual(s.boards[1], other);
+  assert.deepEqual(s.projects[0].shotOrder, ["shot-one", "shot-two"]);
+  s = reorderShots(s, "production-demo", ["shot-two", "shot-one"]);
+  assert.equal(s.boards[0].nodes[0].x, 999);
+  assert.deepEqual(s.projects[0].shotOrder, ["shot-two", "shot-one"]);
+});
+test("placement and Board deletion cannot delete canonical Shot or other placement", () => {
+  for (const s of [
+    removeNodes(fixture(), "board-a", ["placement-a"]),
+    removeBoard(fixture(), "board-a"),
+  ]) {
+    assert.equal(s.shots.length, 2);
+    assert.equal(
+      (s.boards.find((b) => b.id === "board-b")!.nodes[0] as any).shotId,
+      "shot-one",
+    );
+  }
+});
+test("duplicate placement shares Shot; duplicate Shot gets new identity", () => {
+  let s = duplicatePlacement(
+    fixture(),
+    "board-a",
+    "placement-a",
+    "copy-placement",
+  );
+  assert.equal(s.shots.length, 2);
+  assert.equal((s.boards[0].nodes.at(-1) as any).shotId, "shot-one");
+  s = duplicateShot(s, "shot-one", "new-shot");
+  assert.equal(s.shots.length, 3);
+  assert.equal(s.shots[2].id, "new-shot");
+});
+test("planning, free cards and wires remain ordinary Board objects", () => {
+  const s = editFrame(fixture(), "board-a", "planning", {
+    notes: "Still planning",
+  });
+  assert.equal(s.shots.length, 2);
+  assert.equal(s.boards[0].nodes[1].kind, "frame");
+  assert.equal((s.boards[0].nodes[1] as any).notes, "Still planning");
+  assert.deepEqual(
+    s.boards[0].nodes.slice(2).map((n) => n.kind),
+    ["text", "image"],
+  );
+  assert.equal(s.boards[0].wires[0].toId, "planning");
+});
+test("runtime validation rejects versions, dangling placements/order/wires and extra fields", () => {
+  for (const change of [
+    (s: any) => (s.schemaVersion = 99),
+    (s: any) => (s.boards[0].nodes[0].shotId = "missing"),
+    (s: any) => (s.projects[0].shotOrder = []),
+    (s: any) => (s.boards[0].wires[0].toId = "missing"),
+    (s: any) => (s.shots[0].surprise = true),
+  ]) {
+    const s = fixture();
+    change(s);
+    assert.equal(stateSchema.safeParse(s).success, false);
+  }
+});
