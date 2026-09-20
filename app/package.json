@@ -1,0 +1,33 @@
+{
+  "name": "creative-hub",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "AI Workflow & Storyboard App — infinite whiteboard, node wiring, storyboard grid, character bible, world builder.",
+  "scripts": {
+    "dev": "concurrently -n web,api -c cyan,magenta \"vite\" \"node server/index.js\"",
+    "dev:web": "vite",
+    "dev:api": "node server/index.js",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "zustand": "^4.5.5",
+    "jspdf": "^2.5.2",
+    "html2canvas": "^1.4.1",
+    "express": "^4.21.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "concurrently": "^9.1.0",
+    "typescript": "^5.7.2",
+    "vite": "^5.4.11"
+  }
+}

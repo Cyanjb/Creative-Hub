@@ -1,0 +1,76 @@
+# Credentials: only the empty setup template may be committed.
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.pfx
+*.p12
+*.keystore
+secrets.json
+credentials.json
+.npmrc
+.netrc
+.netrw
+.aws/
+.ssh/
+
+# Dependencies, builds, caches and logs.
+node_modules/
+dist/
+build/
+.vite/
+.pnp
+.pnp.js
+*.tsbuildinfo
+*.log
+.cache/
+.parcel-cache/
+.eslintcache
+coverage/
+
+# Local assistant material and source archives.
+/Claude/
+/.claude/
+*.zip
+*.7z
+*.rar
+*.tar
+*.gz
+
+# Browser profiles, databases and test browser state.
+User Data/
+Default/
+profiles/
+browser-data/
+.pw-user-data/
+playwright/.auth/
+storageState*.json
+Cookies
+Cookies-journal
+Login Data
+Login Data-journal
+Web Data
+Local State
+Local Storage/
+Session Storage/
+IndexedDB/
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+
+# Local exports and generated media.
+exports/
+backups/
+rendered/
+*.mp4
+*.mov
+*.webm
+
+# Editor and OS files.
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
