@@ -1,3 +1,4 @@
+import {frameView} from '../../../shared/v2Domain';
 import { useMemo, useState } from 'react';
 import { useStore } from '../../store/useStore';
 import type { FrameNode } from '../../store/types';
@@ -27,7 +28,8 @@ export function EnhanceModal({
   onClose: () => void;
 }) {
   const state = useStore();
-  const board = state.boards.find((b) => b.id === boardId);
+  const rawBoard=state.boards.find((b)=>b.id===boardId);
+  const board=rawBoard?frameView(state,rawBoard):undefined;
   const frame = board?.nodes.find((n) => n.id === frameId) as FrameNode | undefined;
   const prompt = frame?.prompts.find((p) => p.id === promptId);
 

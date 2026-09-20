@@ -1,3 +1,4 @@
+import {frameView} from '../../../shared/v2Domain';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useStore } from '../../store/useStore';
 import { searchKeywords } from '../../lib/keywordLibrary';
@@ -45,7 +46,7 @@ export function SearchPalette({ onClose }: { onClose: () => void }) {
           },
         });
       }
-      for (const n of b.nodes) {
+      for (const n of frameView(state,b).nodes) {
         if (n.kind !== 'frame') continue;
         if (
           has(n.title, n.subtitle, n.scene, n.description, n.notes, n.audio, n.video, ...n.tags, ...n.prompts.map((p) => p.text))

@@ -33,28 +33,18 @@ import {
 import { buildTemplate, type TemplateId } from '../lib/boardTemplates';
 import { deleteBlob, forgetAssetUrl } from './assetDb';
 
-const STORAGE_KEY = 'creative-hub:v1';
-const AUTOSAVE_MS = 5000;
-
-// ── persistence ──────────────────────────────────────────────────────────
-
-function loadState(): HubState {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return { ...EMPTY_STATE };
-    const parsed = JSON.parse(raw) as Partial<HubState>;
-    // Merge over EMPTY_STATE so a save written by an older build that lacked
-    // a collection still loads instead of crashing on undefined.
-    return { ...EMPTY_STATE, ...parsed };
-  } catch (err) {
-    console.error('[creative-hub] could not read saved state, starting fresh', err);
-    return { ...EMPTY_STATE };
-  }
-}
+import {durableState,loadSnapshot,saveSnapshot,SaveCoordinator} from '../lib/v2Persistence';
+import {editFrame,frameView,promoteFrame,placeShot,duplicateShot,reorderShots} from '../../shared/v2Domain';
+const AUTOSAVE_MS=500;
 
 export type SaveStatus = 'idle' | 'pending' | 'saved' | 'error';
 
 interface Ephemeral {
+  loaded:boolean;
+  loadError:string|null;
+  saveError:string|null;
+  mediaErrors:string[];
+  revision:number;
   activeProjectId: string | null;
   activeBoardId: string | null;
   selection: string[];
@@ -73,6 +63,12 @@ interface Ephemeral {
 }
 
 interface Actions {
+  initialize:()=>Promise<void>;
+  promoteFrame:(boardId:string,nodeId:string)=>void;
+  placeShot:(boardId:string,shotId:string)=>void;
+  duplicateShot:(shotId:string)=>void;
+  reorderShots:(productionId:string,order:string[])=>void;
+
   // projects
   createProject: (name: string, description?: string) => Project;
   updateProject: (id: string, patch: Partial<Project>) => void;
@@ -144,7 +140,7 @@ interface Actions {
   setOverlay: (v: Ephemeral['overlay']) => void;
 
   // persistence
-  flushSave: () => void;
+  flushSave: () => Promise<void>;
   importState: (state: HubState) => void;
   resetAll: () => void;
 }
@@ -153,50 +149,19 @@ export type Store = HubState & Ephemeral & Actions;
 
 // ── autosave: debounced 5s, as specified ─────────────────────────────────
 
-let saveTimer: number | null = null;
-
-function scheduleSave(get: () => Store, set: (p: Partial<Store>) => void) {
-  set({ saveStatus: 'pending' });
-  if (saveTimer !== null) window.clearTimeout(saveTimer);
-  saveTimer = window.setTimeout(() => {
-    saveTimer = null;
-    writeNow(get, set);
-  }, AUTOSAVE_MS);
-}
-
-function writeNow(get: () => Store, set: (p: Partial<Store>) => void) {
-  const s = get();
-  const payload: HubState = {
-    projects: s.projects,
-    boards: s.boards,
-    characters: s.characters,
-    worlds: s.worlds,
-    scripts: s.scripts,
-    assets: s.assets,
-    resources: s.resources,
-    links: s.links,
-    notes: s.notes,
-    workflowTemplates: s.workflowTemplates,
-  };
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
-    set({ saveStatus: 'saved', lastSavedAt: Date.now() });
-  } catch (err) {
-    // Almost always the 5MB quota. Image bytes are in IndexedDB, so hitting
-    // this means a genuinely huge board rather than one big drag-and-drop.
-    console.error('[creative-hub] autosave failed', err);
-    set({ saveStatus: 'error' });
-  }
-}
-
+let saveTimer:ReturnType<typeof setTimeout>|null=null;
+let coordinator:SaveCoordinator;
+let initialization:Promise<void>|null=null;
+function scheduleSave(_get:()=>Store,_set:unknown){coordinator.changed();if(saveTimer!==null)clearTimeout(saveTimer);saveTimer=setTimeout(()=>{saveTimer=null;void coordinator.flush().catch(()=>{});},AUTOSAVE_MS);}
 /** Wrap a state mutation so every write schedules a save. */
 function mutate(
   set: (fn: (s: Store) => Partial<Store>) => void,
   get: () => Store,
   fn: (s: Store) => Partial<Store>,
 ) {
+  if(!get().loaded)throw Error('V2 data has not loaded');
   set(fn);
-  scheduleSave(get, (p) => set(() => p));
+  scheduleSave(get, null);
 }
 
 function touchBoard(s: Store, boardId: string, fn: (b: Board) => Board): Partial<Store> {
@@ -206,7 +171,13 @@ function touchBoard(s: Store, boardId: string, fn: (b: Board) => Board): Partial
 }
 
 export const useStore = create<Store>((set, get) => ({
-  ...loadState(),
+  ...EMPTY_STATE,
+  loaded:false,loadError:null,saveError:null,mediaErrors:[],revision:0,
+  initialize:()=>{if(initialization)return initialization;initialization=loadSnapshot().then(({state,revision,mediaErrors})=>{coordinator.revision=revision;set({...state,loaded:true,loadError:null,revision,mediaErrors:mediaErrors.map(m=>m.id+': '+(m.error||m.state))});}).catch(e=>{set({loadError:String(e)});initialization=null;});return initialization;},
+  promoteFrame:(boardId,nodeId)=>mutate(set,get,s=>promoteFrame(durableState(s),boardId,nodeId,uid('sh'))),
+  placeShot:(boardId,shotId)=>mutate(set,get,s=>placeShot(durableState(s),boardId,shotId,uid('pl'))),
+  duplicateShot:(shotId)=>mutate(set,get,s=>duplicateShot(durableState(s),shotId,uid('sh'))),
+  reorderShots:(productionId,order)=>mutate(set,get,s=>reorderShots(durableState(s),productionId,order)),
 
   activeProjectId: null,
   activeBoardId: null,
@@ -235,6 +206,7 @@ export const useStore = create<Store>((set, get) => ({
   deleteProject: (id) =>
     mutate(set, get, (s) => ({
       projects: s.projects.filter((p) => p.id !== id),
+      shots:s.shots.filter(x=>x.productionId!==id),
       boards: s.boards.filter((b) => b.projectId !== id),
       characters: s.characters.filter((c) => c.projectId !== id),
       worlds: s.worlds.filter((w) => w.projectId !== id),
@@ -271,7 +243,7 @@ export const useStore = create<Store>((set, get) => ({
   // Camera changes are constant during a pan — deliberately not autosaved on
   // their own; the next real edit persists them.
   setCamera: (boardId, cam) =>
-    set((s) => ({ boards: s.boards.map((b) => (b.id === boardId ? { ...b, camera: cam } : b)) })),
+    mutate(set,get,(s) => ({ boards: s.boards.map((b) => (b.id === boardId ? { ...b, camera: cam } : b)) })),
   setViewMode: (boardId, mode) =>
     mutate(set, get, (s) => touchBoard(s, boardId, (b) => ({ ...b, viewMode: mode }))),
 
@@ -297,15 +269,7 @@ export const useStore = create<Store>((set, get) => ({
         nodes: b.nodes.map((n) => (n.id === nodeId ? ({ ...n, ...patch } as BoardNode) : n)),
       })),
     ),
-  updateFrame: (boardId, nodeId, patch) =>
-    mutate(set, get, (s) =>
-      touchBoard(s, boardId, (b) => ({
-        ...b,
-        nodes: b.nodes.map((n) =>
-          n.id === nodeId && n.kind === 'frame' ? ({ ...n, ...patch } as FrameNode) : n,
-        ),
-      })),
-    ),
+  updateFrame:(boardId,nodeId,patch)=>mutate(set,get,s=>editFrame(durableState(s),boardId,nodeId,patch)),
   deleteNodes: (boardId, nodeIds) =>
     mutate(set, get, (s) => ({
       ...touchBoard(s, boardId, (b) => ({
@@ -379,6 +343,7 @@ export const useStore = create<Store>((set, get) => ({
   deleteCharacter: (id) =>
     mutate(set, get, (s) => ({
       characters: s.characters.filter((c) => c.id !== id),
+      shots:s.shots.map(x=>({...x,characterIds:x.characterIds.filter(v=>v!==id)})),
       // Drop dangling links from frames so prompts don't resolve to nothing.
       boards: s.boards.map((b) => ({
         ...b,
@@ -400,6 +365,7 @@ export const useStore = create<Store>((set, get) => ({
   deleteWorld: (id) =>
     mutate(set, get, (s) => ({
       worlds: s.worlds.filter((w) => w.id !== id),
+      shots:s.shots.map(x=>({...x,worldIds:x.worldIds.filter(v=>v!==id)})),
       boards: s.boards.map((b) => ({
         ...b,
         nodes: b.nodes.map((n) =>
@@ -428,6 +394,8 @@ export const useStore = create<Store>((set, get) => ({
     forgetAssetUrl(id);
     mutate(set, get, (s) => ({
       assets: s.assets.filter((a) => a.id !== id),
+      shots:s.shots.map(x=>x.imageAssetId===id?{...x,imageAssetId:null}:x),
+      worlds:s.worlds.map(w=>({...w,assetIds:w.assetIds.filter(x=>x!==id)})),
       boards: s.boards.map((b) => ({
         ...b,
         nodes: b.nodes.map((n) => {
@@ -481,7 +449,7 @@ export const useStore = create<Store>((set, get) => ({
     mutate(set, get, (s) => {
       const board = s.boards.find((b) => b.id === boardId);
       if (!board) return {};
-      const nodes = board.nodes.filter((n) => nodeIds.includes(n.id));
+      const nodes = frameView(s,board).nodes.filter((n) => nodeIds.includes(n.id));
       if (!nodes.length) return {};
       // Normalise to origin so the template drops cleanly wherever it lands.
       const minX = Math.min(...nodes.map((n) => n.x));
@@ -490,7 +458,7 @@ export const useStore = create<Store>((set, get) => ({
         id: uid('wt'),
         name,
         description,
-        nodes: nodes.map((n) => ({ ...n, x: n.x - minX, y: n.y - minY })),
+        nodes: nodes.map((n) => {if(n.kind==='frame'){const {shotId,...planning}=n;return {...planning,x:n.x-minX,y:n.y-minY};}return {...n,x:n.x-minX,y:n.y-minY};}),
         wires: board.wires.filter((w) => nodeIds.includes(w.fromId) && nodeIds.includes(w.toId)),
         createdAt: now(),
       };
@@ -547,21 +515,10 @@ export const useStore = create<Store>((set, get) => ({
   setOverlay: (v) => set({ overlay: v }),
 
   // ── persistence ────────────────────────────────────────────────────────
-  flushSave: () => {
-    if (saveTimer !== null) {
-      window.clearTimeout(saveTimer);
-      saveTimer = null;
-    }
-    writeNow(get, (p) => set(() => p));
-  },
-  importState: (state) => {
-    set({ ...EMPTY_STATE, ...state });
-    writeNow(get, (p) => set(() => p));
-  },
-  resetAll: () => {
-    localStorage.removeItem(STORAGE_KEY);
-    set({ ...EMPTY_STATE, activeProjectId: null, activeBoardId: null, selection: [] });
-  },
+  flushSave:()=>{if(saveTimer!==null){clearTimeout(saveTimer);saveTimer=null;}return coordinator.flush();},
+  importState:()=>{throw Error('Real-data importing is deferred in V2 foundation');},
+  resetAll:()=>{throw Error('Workspace reset is disabled in V2 foundation');},
+
 }));
 
 // Selectors ---------------------------------------------------------------
@@ -579,6 +536,9 @@ export const useActiveProject = (): Project | null => {
 /** Don't lose the last few seconds of work when the tab closes. */
 if (typeof window !== 'undefined') {
   window.addEventListener('beforeunload', () => {
-    useStore.getState().flushSave();
+    void useStore.getState().flushSave().catch(()=>{});
   });
 }
+
+coordinator=new SaveCoordinator(()=>durableState(useStore.getState()),saveSnapshot,(saveStatus,error)=>useStore.setState({saveStatus,saveError:error||null,revision:coordinator.revision,...(saveStatus==='saved'?{lastSavedAt:Date.now()}: {})}));
+if(typeof window!=='undefined')window.addEventListener('beforeunload',e=>{if(coordinator.generation!==coordinator.acknowledged){e.preventDefault();e.returnValue='';}});

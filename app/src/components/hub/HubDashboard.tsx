@@ -244,7 +244,7 @@ function ProjectDetail({ projectId, onBack }: { projectId: string; onBack: () =>
       ) : (
         <div className="board-grid">
           {boards.map((b) => {
-            const frames = b.nodes.filter((n) => n.kind === 'frame').length;
+            const frames = b.nodes.filter((n) => (n.kind === 'frame'||n.kind === 'placement')).length;
             return (
               <div key={b.id} className="board-card" style={{ position: 'relative' }}>
                 <button

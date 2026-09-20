@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useStore } from '../../store/useStore';
-import type { Board, BoardNode, FrameNode, ImageNode, TextNode } from '../../store/types';
+import type { RenderBoard as Board, BoardNode, FrameNode, ImageNode, TextNode } from '../../store/types';
 import {
   boundsOf,
   cameraForRect,

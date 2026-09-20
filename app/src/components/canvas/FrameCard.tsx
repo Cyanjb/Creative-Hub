@@ -49,7 +49,8 @@ export function FrameCard({
   const slotH = node.iconOnly ? 118 : Math.max(96, Math.min(node.h * 0.44, node.h - 190));
 
   return (
-    <div className="frame">
+    <div className="frame" data-testid={`frame-${node.id}`}>
+      <div className="v2-frame-role">{node.shotId?'Shot placement':'Planning Frame'} {!node.shotId&&<button onClick={()=>useStore.getState().promoteFrame(boardId,node.id)}>Make Shot</button>}</div>
       {/* ── ports ── */}
       <div
         className={`port in ${wireArmed ? 'armed' : ''}`}

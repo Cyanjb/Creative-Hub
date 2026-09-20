@@ -1,10 +1,11 @@
 import { putBlob, registerAssetUrl, readImageSize } from '../store/assetDb';
+import {useStore} from '../store/useStore';
 import { makeAsset } from './factories';
 import type { Asset } from '../store/types';
 
 /**
  * Take a File (from drop or file picker) into the asset store.
- * Blob goes to IndexedDB; the returned Asset record goes to the board JSON.
+ * Bytes are verified in managed storage before metadata enters the working state.
  */
 export async function importImageFile(file: File, projectId: string, category = 'reference'): Promise<Asset> {
   const asset = makeAsset(projectId, {
@@ -14,7 +15,8 @@ export async function importImageFile(file: File, projectId: string, category = 
     category,
   });
 
-  await putBlob(asset.id, file);
+  await useStore.getState().flushSave();
+  await putBlob(asset.id, file, projectId);
   const url = URL.createObjectURL(file);
   registerAssetUrl(asset.id, url);
 

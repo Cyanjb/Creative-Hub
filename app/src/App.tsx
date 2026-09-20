@@ -1,3 +1,4 @@
+import {frameView} from '../shared/v2Domain';
 import { useEffect, useRef, useState } from 'react';
 import { useStore } from './store/useStore';
 import { HubDashboard } from './components/hub/HubDashboard';
@@ -46,6 +47,8 @@ export default function App() {
   const searchOpen = useStore((s) => s.searchOpen);
   const setSearchOpen = useStore((s) => s.setSearchOpen);
 
+  const loaded=useStore(s=>s.loaded),loadError=useStore(s=>s.loadError),saveError=useStore(s=>s.saveError),mediaErrors=useStore(s=>s.mediaErrors);
+  useEffect(()=>{void useStore.getState().initialize();},[]);
   // Cmd/Ctrl-K anywhere.
   useEffect(() => {
     const h = (e: KeyboardEvent) => {
@@ -58,8 +61,11 @@ export default function App() {
     return () => window.removeEventListener('keydown', h);
   }, [setSearchOpen]);
 
+  if(!loaded)return <main role="status" style={{padding:32}}> {loadError||'Loading durable V2 workspace…'} {loadError&&<button onClick={()=>void useStore.getState().initialize()}>Retry load</button>}</main>;
   return (
     <>
+      {saveError&&<div role="alert" className="v2-error">Save failed — {saveError}<button onClick={()=>void useStore.getState().flushSave().catch(()=>{})}>Retry save</button></div>}
+      {mediaErrors.length>0&&<div role="alert" className="v2-error">Media preservation errors: {mediaErrors.join('; ')}</div>}
       {activeBoardId ? <BoardView /> : <HubDashboard />}
       {searchOpen && <SearchPalette onClose={() => setSearchOpen(false)} />}
       <ToastHost />
@@ -69,7 +75,8 @@ export default function App() {
 
 function BoardView() {
   const state = useStore();
-  const board = state.boards.find((b) => b.id === state.activeBoardId);
+  const rawBoard = state.boards.find((b) => b.id === state.activeBoardId);
+  const board=rawBoard?frameView(state,rawBoard):undefined;
   const project = state.projects.find((p) => p.id === board?.projectId) ?? null;
   const canvasRef = useRef<HTMLDivElement>(null);
 
@@ -165,7 +172,7 @@ function BoardView() {
         ? 'Save failed'
         : state.lastSavedAt
           ? `Saved ${formatTime(state.lastSavedAt)}`
-          : 'Not saved yet';
+          : state.revision ? `Loaded revision ${state.revision}` : 'Not saved yet';
 
   return (
     <div className="shell">
@@ -258,6 +265,7 @@ function BoardView() {
       </div>
 
       {/* ── body ── */}
+      <div className="v2-order" aria-label="Editorial Shot order"><b>Editorial order</b>{project?.shotOrder.map((id,index)=>{const shot=state.shots.find(s=>s.id===id)!;return <span key={id}><span>{shot.shot||shot.title}</span><button className="btn btn-sm" aria-label={`Move ${shot.shot||shot.title} earlier`} disabled={index===0} onClick={()=>{const order=[...project.shotOrder];[order[index-1],order[index]]=[order[index],order[index-1]];state.reorderShots(project.id,order);}}>←</button><button className="btn btn-sm" onClick={()=>state.placeShot(board.id,id)}>Place here</button><button className="btn btn-sm" onClick={()=>state.duplicateShot(id)}>Duplicate Shot</button></span>;})}</div>
       <div className="body-row">
         {/* left toolbar */}
         <div className="toolbar">

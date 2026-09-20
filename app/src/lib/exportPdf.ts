@@ -1,6 +1,6 @@
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
-import type { Board, Character, FrameNode, HubState, Project } from '../store/types';
+import type { RenderBoard as Board, Character, FrameNode, HubState, Project } from '../store/types';
 import { getBlob, peekAssetUrl } from '../store/assetDb';
 import { WIRE_LABELS } from '../store/types';
 

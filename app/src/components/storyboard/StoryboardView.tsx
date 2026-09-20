@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useStore } from '../../store/useStore';
-import type { Board, FrameNode } from '../../store/types';
+import type { RenderBoard as Board, FrameNode } from '../../store/types';
 import { useAssetUrl } from '../../lib/useAssetUrl';
 import { AutoTextarea, toast } from '../ui/Bits';
 import { makeFrame, FRAME_W, FRAME_H } from '../../lib/factories';
@@ -59,7 +59,7 @@ export function StoryboardView({
         <div>
           <h2>{board.name}</h2>
           <div className="muted" style={{ fontSize: 12.5 }}>
-            {frames.length} shot{frames.length === 1 ? '' : 's'} across {groups.length} scene
+            {frames.length} frame{frames.length === 1 ? '' : 's'} across {groups.length} scene
             {groups.length === 1 ? '' : 's'}
           </div>
         </div>
@@ -86,7 +86,7 @@ export function StoryboardView({
           <div className="scene-bar">
             <h3>{g.scene}</h3>
             <span className="n">
-              {g.frames.length} shot{g.frames.length === 1 ? '' : 's'}
+              {g.frames.length} frame{g.frames.length === 1 ? '' : 's'}
             </span>
           </div>
           <div className="sb-grid">
@@ -148,7 +148,7 @@ function StoryboardCell({
   };
 
   return (
-    <div className={`sb-cell ${selected ? 'sel' : ''}`} onClick={() => setSelection([frame.id])}>
+    <div data-testid={`story-${frame.id}`} className={`sb-cell ${selected ? 'sel' : ''}`} onClick={() => setSelection([frame.id])}>
       <div
         className={`sb-img ${dropping ? 'drop' : ''}`}
         onDragOver={(e) => {
