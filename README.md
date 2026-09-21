@@ -1,101 +1,55 @@
 # Creative Hub
 
+The Creative Hub app: a canvas and storyboard tool, V1 built on 3 August 2026 and running,
+moving to V2. **This repository is about the app and nothing else.**
+
 > **Read this before concluding anything about what exists.**
 >
-> **The Creative Hub app is not in this repository.** It was built on 3 August 2026, it runs,
-> and it lives only on a Windows machine at `C:\Users\cyanj\Creative Hub`. It has never been
-> pushed.
->
-> An AI that can see only this repo has already once concluded the project was never built.
-> That conclusion was wrong. Do not repeat it.
->
-> The live status of everything is in Craft: **Coding Projects → Creative Hub → "5. V2 Status &
-> Cross-Chat Log"**. That document is the single source of truth. This repo holds artifacts.
+> - **The live V1 app runs from `C:\Users\cyanj\Creative Hub`** on a Windows machine. That
+>   folder is the original. Its documents are in `C:\Users\cyanj\Creative Hub\docs\`
+>   (`V2-RECONNAISSANCE-AUDIT.md`, `Claude-Architecture-Review-Creative-Hub.pdf`, and others).
+> - **In this repo the app lives under `app/`**, on the branches listed below. On `main`, at the
+>   time of writing, there is no `app/` yet: the V1 import and the V2 work are on branches that
+>   have not been merged. An AI that can see only `main` has already once concluded the project
+>   was never built. That conclusion was wrong. Do not repeat it.
+> - **The skills library is not here any more.** Cyan's Claude skills, the vertical-drama
+>   pipeline, the shuohao gap report and the planning specs moved to their own repository,
+>   [`Cyanjb/cy-skills`](https://github.com/Cyanjb/cy-skills), on 21 September 2026. Nothing in
+>   that repo governs this one and nothing here governs it.
+> - The live status of everything is in Craft: **Coding Projects → Creative Hub → "5. V2 Status &
+>   Cross-Chat Log"**. That document is the single source of truth. This repo holds artifacts.
 
 ---
 
-## Two workstreams share this repository
+## Branches
 
-They are separate projects. Neither depends on the other. They share a repo only because that is
-where documents were being kept.
+| Branch | What it holds |
+|---|---|
+| `main` | The trunk. `.gitignore`, this README, `PUSHING-THE-APP.md`. |
+| `add-v1-app` | The V1 app imported into `app/`, unchanged. |
+| `v2-foundation` | V1 plus the V2 foundation: shared validated domain, revisioned SQLite persistence, durable canonical Shots, browser acceptance. Developed further than the live folder. |
 
-| | **Creative Hub app** | **Skills library** |
-|---|---|---|
-| What it is | A canvas and storyboard app, V1 built, moving to V2 | Claude skills, 44 synced plus 1 built here |
-| What it produces | A tool you open | Instructions and validators Claude loads |
-| Where its code lives | `C:\Users\cyanj\Creative Hub`, **not in this repo** | `skills/vertical-drama-pipeline/`, **in this repo** |
-| Its documents here | `V2-RECONNAISSANCE-AUDIT.md`, `Claude-Architecture-Review-Creative-Hub.pdf` | `GAP-REPORT-…`, `SPEC-…`, `EDITS-…` |
-| Its blocker | Pushing V1 to GitHub | The Seedance cut-timing test |
+Working branches are named `claude/<topic>-<id>` and are merged into `main` when their work
+lands.
 
-They genuinely overlap in two places, and both are worth exploiting rather than untangling:
-
-1. **Does Seedance 2.5 honour in-prompt cut timing?** The app's Shot model and the pipeline's
-   phase 3 both depend on the answer. One test settles both. Do not run it twice.
-2. **Cost tracking.** The `credit-watch` skill already quotes before and reconciles after. V2
-   plans the same thing inside the app. Whichever is built second should read the first one's
-   ledger rather than starting a new one.
-
----
-
-## What is in here
-
-### The skills workstream
+## Files on `main`
 
 | File | What it is |
 |---|---|
-| [`GAP-REPORT-shuohao-vs-creative-hub.md`](GAP-REPORT-shuohao-vs-creative-hub.md) | Teardown of `eternityspring/shuohao-skills` (Apache 2.0) against the existing 44-skill library. 21 steals, each naming the skill, the file and the edit. Verdicts on four suspected gaps, with file-and-line evidence |
-| [`SPEC-vertical-drama-pipeline.md`](SPEC-vertical-drama-pipeline.md) | Design for a vertical micro-drama pipeline. Three-way intake, a JSON spine, roughly 55 gates, five build phases, eight open questions |
-| [`EDITS-to-existing-skills.md`](EDITS-to-existing-skills.md) | Five exact find-and-replace blocks for skills that are not micro-drama-specific. Every anchor verified, all five dry-run applied. **Not yet applied to the real files** |
-| [`skills/vertical-drama-pipeline/`](skills/vertical-drama-pipeline/) | The built skill. Phases 1 and 2 |
+| `PUSHING-THE-APP.md` | How the V1 app was copied into `app/` without its secrets, and the checks to run before any commit that touches `app/`. **Step 5 is the one that matters.** |
+| `.gitignore` | Blocks `.env`, `node_modules`, `dist`, `.vite` and local runtime data. `app/` carries its own copy. |
 
-### The app workstream
+## The two things that must stay true
 
-| File | What it is |
-|---|---|
-| [`V2-RECONNAISSANCE-AUDIT.md`](V2-RECONNAISSANCE-AUDIT.md) | The V2 audit, 19 September 2026. Contained one major error about the app not existing; corrected the same day. Do not trust a copy dated before that correction |
-| [`Claude-Architecture-Review-Creative-Hub.pdf`](Claude-Architecture-Review-Creative-Hub.pdf) | Prior architecture review. **No AI has successfully read this file.** Claude Code could not open it, no poppler and the streams would not decompress. If it contradicts either plan, it wins, and nobody has checked |
+1. **`.env` never enters git.** The app keeps API keys in `.env` and the Express proxy reads
+   them from there. If that file is ever committed and pushed, the keys are published and must
+   be revoked. `.gitignore` blocks it; `PUSHING-THE-APP.md` step 5 checks it. Do not skip the check.
+2. **The live folder and `app/` are not the same thing.** `v2-foundation` has moved past the
+   live V1. Which one is the truth going forward is a decision recorded in Craft, not here. Do
+   not edit both.
 
----
+## The shared blocker
 
-## The skill
-
-`skills/vertical-drama-pipeline/` runs a vertical micro-drama series from intake to a locked
-script. Zero dependencies, Node 18 or later, standard library only.
-
-```bash
-cd skills/vertical-drama-pipeline
-
-node scripts/selftest.mjs                                    # 188 assertions, no model called
-node scripts/pipeline.mjs checkup examples/tidewrack-outline.json --stage outline
-node scripts/pipeline.mjs stats  examples/tidewrack-script.json
-```
-
-**Built:** the outline and script stages, 23 gates, the runtime maths, health-check mode, and a
-seed that carries settled facts downstream so no stage re-derives an upstream decision.
-
-**Not built:** the shots stage, deliberately. Its model assumes the engine honours in-prompt cut
-timing, which is unverified. The cast and world stages are also unbuilt; their cross-stage gates
-skip cleanly and say so.
-
-Every gate has a breach case in the self-test proving it blocks, because a gate with only a
-passing fixture is an assertion that a gate exists rather than a promise that it works.
-
----
-
-## Conventions
-
-- **Branches.** `main` is the trunk. Working branches are named `claude/<topic>-<id>` and are
-  merged here when their work lands.
-- **Skills are a synced snapshot.** The library lives at `~/.claude/skills/synced/<bucket-id>/`
-  with a manifest, which means it is pushed down from a Claude account rather than authored in
-  place. **Editing files there risks being overwritten on the next sync.** Author them wherever
-  they actually come from.
-- **Status belongs in Craft, artifacts belong here.** Structure that a validator can check lives
-  in JSON in this repo. Concept, emotional reasoning and the readable bible live in Craft. If a
-  fact is only in a chat transcript, it is lost.
-
-## Attribution
-
-`skills/vertical-drama-pipeline/references/SOURCES.md` records what was learned from
-[shuohao-skills](https://github.com/eternityspring/shuohao-skills) (Apache 2.0, Copyright 2026
-烁皓) and states that no code was ported from it.
+**Does Seedance 2.5 honour in-prompt cut timing?** The app's Shot model depends on the answer,
+and so does the shots stage of the vertical-drama pipeline in `cy-skills`. One three-cut segment
+settles it. Run it once, tell both projects.
