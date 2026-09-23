@@ -8,10 +8,10 @@ moving to V2. **This repository is about the app and nothing else.**
 > - **The live V1 app runs from `C:\Users\cyanj\Creative Hub`** on a Windows machine. That
 >   folder is the original. Its documents are in `C:\Users\cyanj\Creative Hub\docs\`
 >   (`V2-RECONNAISSANCE-AUDIT.md`, `Claude-Architecture-Review-Creative-Hub.pdf`, and others).
-> - **In this repo the app lives under `app/`**, on the branches listed below. On `main`, at the
->   time of writing, there is no `app/` yet: the V1 import and the V2 work are on branches that
->   have not been merged. An AI that can see only `main` has already once concluded the project
->   was never built. That conclusion was wrong. Do not repeat it.
+> - **In this repo the app lives under `app/` on `main`.** The V1 import and the V2 foundation
+>   were merged there on 23 September 2026. An AI that could see only `main` has already once
+>   concluded the project was never built. That conclusion was wrong then and there is no excuse
+>   for it now: look in `app/`.
 > - **The skills library is not here any more.** Cyan's Claude skills, the vertical-drama
 >   pipeline, the shuohao gap report and the planning specs moved to their own repository,
 >   [`Cyanjb/cy-skills`](https://github.com/Cyanjb/cy-skills), on 21 September 2026. Nothing in
@@ -25,17 +25,23 @@ moving to V2. **This repository is about the app and nothing else.**
 
 | Branch | What it holds |
 |---|---|
-| `main` | The trunk. `.gitignore`, this README, `PUSHING-THE-APP.md`. |
-| `add-v1-app` | The V1 app imported into `app/`, unchanged. |
-| `v2-foundation` | V1 plus the V2 foundation: shared validated domain, revisioned SQLite persistence, durable canonical Shots, browser acceptance. Developed further than the live folder. |
+| `main` | **The trunk, and everything.** The app under `app/`, plus the V2 foundation. Start here. |
+| `add-v1-app` | Merged into `main`. Fully contained in `v2-foundation`. Safe to delete. |
+| `v2-foundation` | Merged into `main`. Safe to delete. |
 
 Working branches are named `claude/<topic>-<id>` and are merged into `main` when their work
 lands.
+
+**Before merging any branch created before 21 September 2026**, check whether it would bring back
+`skills/` or the planning documents. Those were deliberately removed when the skills moved to
+`cy-skills`. A merge that resurrects them has undone a decision, not preserved work.
 
 ## Files on `main`
 
 | File | What it is |
 |---|---|
+| `CLAUDE.md` | Loaded automatically by every Claude Code session. The short brief: what this repo is, the one rule about `.env`, and the open question that blocks two projects. |
+| `app/` | The application. V1 as built, plus the V2 foundation and its tests under `app/tests/`. |
 | `PUSHING-THE-APP.md` | How the V1 app was copied into `app/` without its secrets, and the checks to run before any commit that touches `app/`. **Step 5 is the one that matters.** |
 | `.gitignore` | Blocks `.env`, `node_modules`, `dist`, `.vite` and local runtime data. `app/` carries its own copy. |
 
