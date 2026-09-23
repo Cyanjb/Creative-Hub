@@ -43,14 +43,29 @@ branch. Keep it that way.
   back has undone a decision rather than preserved work.
 - App tests live in `app/tests/`. Run them before pushing changes to `app/`.
 
-## The open question that blocks two projects
+## The question that blocked two projects, now answered
 
-**Does Seedance 2.5 honour in-prompt cut timing inside one generation?**
+**Does Seedance 2.5 honour in-prompt cut timing inside one generation? Yes.** Measured
+23 September 2026. **Do not re-run this test.** The app's Shot model assumed it and the
+assumption holds, with one correction: cuts land **early**, and the error **grows through the
+clip**.
 
-The app's Shot model assumes it does. So does the shots stage of the vertical-drama pipeline in
-`cy-skills`. One three-cut segment settles it for both. It has not been run. Do not design
-around an assumed answer, and if you do run it, record the result in Craft where both projects
-can see it.
+| Engine | Cut asked | Cut measured | Error |
+|---|---|---|---|
+| MiniMax Hailuo 3 | 3.3 / 6.6 | 3.25 / 6.46 | -0.05 / -0.14 |
+| Seedance 2.5 | 3.3 / 6.6 | 3.08 / 6.21 | -0.22 / -0.39 |
+| Kling 3.0 multishot | 1.67 / 3.33 | 1.29 / 3.71 | -0.38 / +0.38 |
+
+**Hailuo 3 measured roughly three times more accurate than Seedance 2.5.** Kling multishot did
+not split evenly despite its documentation saying it does.
+
+What this means for the Shot model: a Shot's duration is a request, not a guarantee. Anything
+that assembles Shots into a timeline needs a per-engine tolerance, and drift accumulates rather
+than cancelling out. A tolerance value has not been agreed yet.
+
+Full numbers, costs and what is still unmeasured:
+[`cy-skills/CUT-TIMING-TEST-2026-09-23.md`](https://github.com/Cyanjb/cy-skills/blob/main/CUT-TIMING-TEST-2026-09-23.md),
+and the same results are in Craft under 23 September 2026.
 
 ## Tone
 

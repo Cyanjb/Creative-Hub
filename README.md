@@ -54,8 +54,17 @@ lands.
    live V1. Which one is the truth going forward is a decision recorded in Craft, not here. Do
    not edit both.
 
-## The shared blocker
+## The shared blocker, cleared
 
-**Does Seedance 2.5 honour in-prompt cut timing?** The app's Shot model depends on the answer,
-and so does the shots stage of the vertical-drama pipeline in `cy-skills`. One three-cut segment
-settles it. Run it once, tell both projects.
+**Does Seedance 2.5 honour in-prompt cut timing? Yes.** Tested 23 September 2026 on Runway
+credits and measured frame by frame. Seedance 2.5 and MiniMax Hailuo 3 both produce hard cuts in
+the right order with the right content; Hailuo is about three times more accurate. Cuts land
+early and the error grows through the clip. Kling 3.0 multishot does not divide evenly despite
+its documentation.
+
+For the app's Shot model this means a Shot duration is a request, not a guarantee, and the drift
+accumulates. A per-engine tolerance is needed and has not been agreed yet.
+
+Full numbers and costs:
+[`cy-skills/CUT-TIMING-TEST-2026-09-23.md`](https://github.com/Cyanjb/cy-skills/blob/main/CUT-TIMING-TEST-2026-09-23.md).
+**Do not re-run the test.**
