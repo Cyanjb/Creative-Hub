@@ -1,0 +1,440 @@
+/* ═══════════════════════════════════════════════════════════════════
+   Creative Hub — design tokens.
+   Black ground, glass panels, neon cyan + fuchsia. Elegant, not loud:
+   the neon is reserved for state (selected, active, live) so it still
+   means something when it appears.
+   ═══════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Ground */
+  --bg: #050609;
+  --bg-1: #0a0c12;
+  --bg-2: #0f1219;
+  --bg-3: #151924;
+
+  /* Glass surfaces — "white panels" as translucent elevation. */
+  --panel: rgba(255, 255, 255, 0.038);
+  --panel-2: rgba(255, 255, 255, 0.06);
+  --panel-solid: #12151d;
+  --panel-hi: rgba(255, 255, 255, 0.09);
+
+  /* Lines */
+  --line: rgba(255, 255, 255, 0.09);
+  --line-2: rgba(255, 255, 255, 0.15);
+  --line-strong: rgba(255, 255, 255, 0.26);
+
+  /* Text */
+  --tx: #e9edf6;
+  --tx-2: #a2abbf;
+  --tx-3: #6c7488;
+  --tx-4: #474e5f;
+
+  /* Accents */
+  --cyan: #22d3ee;
+  --cyan-dim: #0e7490;
+  --cyan-glow: rgba(34, 211, 238, 0.5);
+  --magenta: #f0abfc;
+  --magenta-hot: #e879f9;
+  --magenta-glow: rgba(232, 121, 249, 0.45);
+  --violet: #a855f7;
+  --yellow: #facc15;
+  --green: #34d399;
+  --red: #fb7185;
+
+  /* Wire colours — spec'd: white = image, purple = video, yellow = text */
+  --wire-image: #ffffff;
+  --wire-video: #a855f7;
+  --wire-text: #facc15;
+
+  /* Geometry */
+  --r-sm: 6px;
+  --r: 10px;
+  --r-lg: 14px;
+  --r-xl: 20px;
+
+  --shadow-card: 0 10px 30px -8px rgba(0, 0, 0, 0.75), 0 2px 8px rgba(0, 0, 0, 0.5);
+  --shadow-float: 0 24px 60px -12px rgba(0, 0, 0, 0.85), 0 4px 16px rgba(0, 0, 0, 0.6);
+  --glow-cyan: 0 0 0 1px var(--cyan), 0 0 18px -2px var(--cyan-glow);
+  --glow-magenta: 0 0 0 1px var(--magenta-hot), 0 0 18px -2px var(--magenta-glow);
+
+  --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  --topbar-h: 52px;
+  --toolbar-w: 60px;
+  --sidebar-w: 320px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--tx);
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow: hidden;
+}
+
+::selection {
+  background: var(--cyan);
+  color: #04202a;
+}
+
+/* Scrollbars — thin and out of the way. */
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.11);
+  border-radius: 6px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+  background-clip: padding-box;
+}
+
+/* ── primitives ─────────────────────────────────────────────────── */
+
+.glass {
+  background: var(--panel);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  border: 1px solid var(--line);
+}
+
+button {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+input,
+textarea,
+select {
+  font-family: inherit;
+  font-size: inherit;
+  color: var(--tx);
+  background: rgba(0, 0, 0, 0.32);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  padding: 7px 10px;
+  outline: none;
+  width: 100%;
+  transition: border-color 0.14s, box-shadow 0.14s;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--cyan-dim);
+  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.13);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--tx-4);
+}
+
+textarea {
+  resize: vertical;
+  line-height: 1.55;
+}
+
+/* Ghost inputs — used inside cards where the field shouldn't look like a field
+   until you touch it. */
+.ghost-input {
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 3px 6px;
+  border-radius: var(--r-sm);
+  width: 100%;
+}
+.ghost-input:hover {
+  background: rgba(255, 255, 255, 0.045);
+}
+.ghost-input:focus {
+  background: rgba(0, 0, 0, 0.35);
+  border-color: var(--cyan-dim);
+  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.12);
+}
+
+/* ── buttons ────────────────────────────────────────────────────── */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 13px;
+  border-radius: var(--r);
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  color: var(--tx-2);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: all 0.14s ease;
+}
+.btn:hover {
+  background: var(--panel-hi);
+  color: var(--tx);
+  border-color: var(--line-2);
+}
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, rgba(34, 211, 238, 0.2), rgba(232, 121, 249, 0.16));
+  border-color: rgba(34, 211, 238, 0.45);
+  color: var(--tx);
+}
+.btn-primary:hover {
+  background: linear-gradient(135deg, rgba(34, 211, 238, 0.32), rgba(232, 121, 249, 0.26));
+  border-color: var(--cyan);
+  box-shadow: 0 0 20px -6px var(--cyan-glow);
+}
+
+.btn-ghost {
+  background: transparent;
+  border-color: transparent;
+}
+.btn-ghost:hover {
+  background: var(--panel-2);
+}
+
+.btn-danger:hover {
+  background: rgba(251, 113, 133, 0.14);
+  border-color: rgba(251, 113, 133, 0.5);
+  color: var(--red);
+}
+
+.btn-sm {
+  padding: 4px 9px;
+  font-size: 12px;
+  border-radius: var(--r-sm);
+}
+
+.btn-icon {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  justify-content: center;
+  border-radius: var(--r-sm);
+}
+
+.btn.active {
+  background: rgba(34, 211, 238, 0.15);
+  border-color: var(--cyan);
+  color: var(--cyan);
+}
+
+/* ── chips / tags ───────────────────────────────────────────────── */
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(34, 211, 238, 0.11);
+  border: 1px solid rgba(34, 211, 238, 0.28);
+  color: var(--cyan);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+.tag.magenta {
+  background: rgba(232, 121, 249, 0.11);
+  border-color: rgba(232, 121, 249, 0.3);
+  color: var(--magenta);
+}
+.tag.plain {
+  background: var(--panel-2);
+  border-color: var(--line);
+  color: var(--tx-3);
+}
+.tag button {
+  color: inherit;
+  opacity: 0.6;
+  font-size: 13px;
+  line-height: 1;
+}
+.tag button:hover {
+  opacity: 1;
+}
+
+/* ── labels / headings ──────────────────────────────────────────── */
+
+.label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--tx-3);
+}
+
+.section-title {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--tx-3);
+  margin: 0;
+}
+
+.muted {
+  color: var(--tx-3);
+}
+.dim {
+  color: var(--tx-4);
+}
+
+/* ── layout helpers ─────────────────────────────────────────────── */
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.col {
+  display: flex;
+  flex-direction: column;
+}
+.spacer {
+  flex: 1;
+}
+.scroll-y {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* ── modal ──────────────────────────────────────────────────────── */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 3, 6, 0.78);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 400;
+  animation: fade 0.16s ease;
+}
+
+.modal {
+  background: var(--panel-solid);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-float);
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  animation: rise 0.2s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+.modal-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--line);
+}
+.modal-head h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.modal-body {
+  padding: 20px 22px;
+  overflow-y: auto;
+}
+.modal-foot {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  padding: 14px 22px;
+  border-top: 1px solid var(--line);
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+  }
+}
+
+/* ── field ──────────────────────────────────────────────────────── */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 14px;
+}
+.field > label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--tx-3);
+}
+.field .hint {
+  font-size: 11px;
+  color: var(--tx-4);
+  line-height: 1.45;
+}
+
+/* ── empty state ────────────────────────────────────────────────── */
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 44px 24px;
+  text-align: center;
+  color: var(--tx-4);
+}
+.empty .big {
+  font-size: 30px;
+  opacity: 0.5;
+}
+.empty p {
+  margin: 0;
+  font-size: 13px;
+  max-width: 320px;
+  line-height: 1.55;
+}

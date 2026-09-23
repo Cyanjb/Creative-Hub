@@ -1,0 +1,49 @@
+{
+  "name": "creative-hub",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "AI Workflow & Storyboard App â€” infinite whiteboard, node wiring, storyboard grid, character bible, world builder.",
+  "scripts": {
+    "dev": "concurrently -n web,api -c cyan,magenta \"vite\" \"tsx server/index.js\"",
+    "dev:web": "vite",
+    "dev:api": "tsx server/index.js",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test tests/*.test.ts",
+    "test:browser": "playwright test",
+    "seed:synthetic": "tsx server/storageCli.ts seed",
+    "backup": "tsx server/storageCli.ts backup",
+    "restore": "tsx server/storageCli.ts restore"
+  },
+  "dependencies": {
+    "better-sqlite3": "12.8.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^2.5.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tsx": "4.21.0",
+    "zod": "3.25.76",
+    "zustand": "^4.5.5"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.58.2",
+    "@types/better-sqlite3": "7.6.13",
+    "@types/express": "4.17.25",
+    "@types/node": "22.20.4",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "concurrently": "^9.1.0",
+    "prettier": "3.5.3",
+    "typescript": "^5.7.2",
+    "vite": "^5.4.11"
+  },
+  "engines": {
+    "node": ">=22.14.0 <23"
+  }
+}

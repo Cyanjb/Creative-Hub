@@ -40,3 +40,12 @@ rendered/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# V2 managed runtime data (outside repository).
+*.sqlite*
+*.db-*
+managed-data/
+staging/
+backups/
+test-results/
+playwright-report/
